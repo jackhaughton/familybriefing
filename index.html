@@ -124,8 +124,23 @@
       async function listUpcomingEvents() {
         let response;
         try {
+          response = await gapi.client.calendar.list({});
+        } catch (err) {
+          document.getElementById('content').innerText = err.message;
+          return;
+        }
+        const calendars = response.result.items;
+        var calid = 'primary';
+        for (var i=0; i < calendars.length; i++) {
+            if (calendars[i].summary == "FamilyBriefing") {
+                calid = calendars[i].id;
+                break;
+            }
+        }
+        
+        try {
           const request = {
-            'calendarId': 'FamilyBriefing',
+            'calendarId': calid,
             'timeMin': (new Date()).toISOString(),
             'showDeleted': false,
             'singleEvents': true,
