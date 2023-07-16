@@ -5,13 +5,11 @@
     <meta charset="utf-8" />
   </head>
   <body>
-    <p>Google Calendar API Quickstart</p>
-
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
     <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
 
-    <pre id="content" style="white-space: pre-wrap;"></pre>
+    <ul id="content"></ul>
 
     <script type="text/javascript">
       /* exported gapiLoaded */
@@ -139,9 +137,12 @@
         }
         
         try {
+          var tomorrow = new Date() + 1;
+          tomorrow.setHours(0, 0, 0, 0);
           const request = {
             'calendarId': calid,
             'timeMin': (new Date()).toISOString(),
+            'timeMax': tomorrow.toISOString(),
             'showDeleted': false,
             'singleEvents': true,
             'maxResults': 10,
@@ -158,11 +159,11 @@
           document.getElementById('content').innerText = 'No events found.';
           return;
         }
-        // Flatten to string to display
-        const output = events.reduce(
-            (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,
-            'Events:\n');
-        document.getElementById('content').innerText = output;
+        const ul = document.getElementById('content');
+        ul.innerHTML = "";
+        for (var i=0; i < events.length; i++) {
+            ul.innerHTML += "<li>" + event.summary.replace('[', '<b>').replace(']', '</b>') + "</li>";
+        }
       }
     </script>
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
