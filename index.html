@@ -137,7 +137,8 @@
         }
         
         try {
-          var tomorrow = new Date() + 1;
+          var tomorrow = new Date();
+          tomorrow += 1;
           tomorrow.setHours(0, 0, 0, 0);
           const request = {
             'calendarId': calid,
