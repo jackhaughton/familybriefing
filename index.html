@@ -163,6 +163,7 @@
         const ul = document.getElementById('content');
         ul.innerHTML = "";
         for (var i=0; i < events.length; i++) {
+            const event = events[i];
             ul.innerHTML += "<li>" + event.summary.replace('[', '<b>').replace(']', '</b>') + "</li>";
         }
       }
