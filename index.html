@@ -124,7 +124,7 @@
       async function listUpcomingEvents() {
         let response;
         try {
-          response = await gapi.client.calendar.list({});
+          response = await gapi.client.calendar.calendarList.list({});
         } catch (err) {
           document.getElementById('content').innerText = err.message;
           return;
