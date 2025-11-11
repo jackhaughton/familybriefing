@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Today's List</title>
+    <style>
+        :root {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+            color: #111
+        }
+
+        body {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 16px
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem
+        }
+
+        #status {
+            margin: 8px 0;
+            color: #555
+        }
+
+        ul {
+            padding-left: 1.25rem
+        }
+
+        li {
+            margin: 6px 0
+        }
+
+        .error {
+            color: #9b1c1c
+        }
+
+        .muted {
+            color: #666;
+            font-size: 0.95rem
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Today's List</h1>
+    <div id="status" class="muted">Loading…</div>
+    <ul id="items" aria-live="polite"></ul>
+
+
+    <script>
+        // Fetch /today and render the JSON array into a simple <ul>
+        async function loadToday() {
+            const status = document.getElementById('status');
+            const list = document.getElementById('items');
+
+
+            // Clear any existing list items
+            list.innerHTML = '';
+
+
+            try {
+                // 10s timeout using AbortController
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+
+                const res = await fetch('/today', { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+
+                if (!res.ok) throw new Error('Server responded with ' + res.status + ' ' + res.statusText);
+
+
+                const data = await res.json();
+
+
+                if (!Array.isArray(data)) throw new Error('Expected JSON array from /today');
+
+
+                if (data.length === 0) {
+                    status.textContent = 'No items for today.';
+                    return;
+                }
+
+
+                status.textContent = '';
+
+
+                data.forEach(item => {
+                    const li = document.createElement('li');
+
+
+                    // Support strings/numbers and simple objects (try `name` field first)
+                    if (typeof item === 'string' || typeof item === 'number') {
+                        li.textContent = item;
+                    } else if (item && typeof item === 'object') {
+                        if ('name' in item && (typeof item.name === 'string' || typeof item.name === 'number')) {
+                            li.textContent = item.name;
+                        } else {
+                            // Fallback to pretty JSON for unknown object shapes
+                            li.textContent = JSON.stringify(item);
+                        }
+                    } else {
+                        li.textContent = String(item);
+                    }
+
+
+                    list.appendChild(li);
+                });
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    status.textContent = 'Request timed out. Try again.';
+                    status.classList.add('error');
+                } else {
+                    status.textContent = 'Error: ' + err.message;
+                    status.classList.add('error');
+                }
+            }
+        }
+
+
+        // Load on first paint; expose reload via double-click for convenience
+        document.addEventListener('DOMContentLoaded', () => {
+            loadToday();
+            // Automatically refresh every 5 minutes (300,000 ms)
+            setInterval(loadToday, 300000);
+        });
+        document.getElementById('status').addEventListener('dblclick', loadToday);
+    </script>
+</body>
+
+</html>
