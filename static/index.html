@@ -94,11 +94,8 @@
                 data.forEach(item => {
                     const li = document.createElement('li');
 
-
                     // Support strings/numbers and simple objects (try `name` field first)
-                    if (typeof item === 'string' || typeof item === 'number') {
-                        li.textContent = item;
-                    } else if (item && typeof item === 'object') {
+                    if (item && typeof item === 'object') {
                         if ('name' in item && (typeof item.name === 'string' || typeof item.name === 'number')) {
                             li.textContent = item.name;
                         } else {
@@ -106,7 +103,15 @@
                             li.textContent = JSON.stringify(item);
                         }
                     } else {
-                        li.textContent = String(item);
+                        var stritem = String(item);
+                        const re = /^\[([^\]]*)\] (.*)$/
+                        var m = stritem.match(re);
+                        if (m !== null) {
+                            li.innerHTML = "<b>" + m[1] + "</b> " + m[2];
+                        }
+                        else {
+                            li.textContent = stritem;
+                        }
                     }
 
 
@@ -128,7 +133,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadToday();
             // Automatically refresh every 5 minutes (300,000 ms)
-            setInterval(loadToday, 300000);
+            setInterval(() => { window.location = window.location.href; }, 300000);
         });
         document.getElementById('status').addEventListener('dblclick', loadToday);
     </script>
