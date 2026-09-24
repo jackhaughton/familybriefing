@@ -108,15 +108,18 @@
                         }
                     } else {
                         var stritem = String(item);
-                        var re;
+                        var re = null;
 
-                        if (m.indexOf("[") == 0) {
+                        if (stritem.indexOf("[") == 0) {
                             re = /^\[([^\]]*)\] (.*)$/
                         }
-                        else if (m.indexOf("(") == 0) {
+                        else if (stritem.indexOf("(") == 0) {
                             re = /^\(([^\)]*)\) (.*)$/
                         }
-                        var m = stritem.match(re);
+                        var m = null;
+                        if (re !== null) {
+                            m = stritem.match(re);
+                        }
                         if (m !== null) {
                             li.innerHTML = "<b>" + m[1] + ":</b> " + m[2];
                         }
