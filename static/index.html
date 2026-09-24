@@ -108,7 +108,14 @@
                         }
                     } else {
                         var stritem = String(item);
-                        const re = /^\[([^\]]*)\] (.*)$/
+                        var re;
+
+                        if (m.indexOf("[") == 0) {
+                            re = /^\[([^\]]*)\] (.*)$/
+                        }
+                        else if (m.indexOf("(") == 0) {
+                            re = /^\(([^\)]*)\) (.*)$/
+                        }
                         var m = stritem.match(re);
                         if (m !== null) {
                             li.innerHTML = "<b>" + m[1] + ":</b> " + m[2];
